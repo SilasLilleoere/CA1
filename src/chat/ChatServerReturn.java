@@ -6,14 +6,12 @@
 package chat;
 
 import Interface.ChatInterface;
-import static chat.ChatServer.CurrentUsers;
+import static chat.ChatServer.usersArray;
 import date.DateTime;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
 /**
  *
@@ -21,6 +19,8 @@ import java.util.logging.Logger;
  */
 public class ChatServerReturn implements Runnable, ChatInterface {
 
+    String username;
+    ArrayList<String> tempArray = new ArrayList<String>();
     DateTime dt = new DateTime();
     Socket SOCK;
     private Scanner INPUT;
@@ -28,27 +28,23 @@ public class ChatServerReturn implements Runnable, ChatInterface {
     String MESSAGE = "";
 //------------------------------------------------------------
 
-    public ChatServerReturn(Socket X) {
+    public ChatServerReturn(Socket X, String username) {
         this.SOCK = X;
-        try {
-            addUserName(SOCK);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
+        this.username = username;
         UserList();
     }
 
 //  Check for dead connections ------------------------------------------------------------
     public void checkConnection() throws IOException {
         if (!SOCK.isConnected()) {
-            for (int i = 1; i <= ChatServer.ConnectionArray.size(); i++) {
-                if (ChatServer.ConnectionArray.get(i) == SOCK) {
-                    ChatServer.ConnectionArray.remove(i);
+            for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
+                if (ChatServer.usersArray.get(i).getSOCK() == SOCK) {
+                    ChatServer.usersArray.remove(i);
                 }
             }
-            for (int i = 1; i <= ChatServer.ConnectionArray.size(); i++) {
+            for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
 
-                Socket TEMPSOCK = ChatServer.ConnectionArray.get(i - 1);
+                Socket TEMPSOCK = ChatServer.usersArray.get(i - 1).getSOCK();
                 PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
                 TEMPOUT.println(TEMPSOCK.getLocalAddress().getHostName() + " disconnected!");
                 TEMPOUT.flush();
@@ -94,49 +90,64 @@ public class ChatServerReturn implements Runnable, ChatInterface {
 
     @Override
     public void Stop(String msg) {
-	try {
-	    SOCK.close();
-	} catch (IOException ex) {
-	    System.out.println("Stop failed" + ex);
-	}
+        try {
+            SOCK.close();
+        } catch (IOException ex) {
+            System.out.println("Stop failed" + ex);
+        }
     }
 
     @Override
     public void User(String msg) {
-	Scanner INPUT;
-	try {
-	    INPUT = new Scanner(SOCK.getInputStream());
-	    String USERNAME = INPUT.nextLine();
-	    OUT.println("USER#" + USERNAME);
-	} catch (IOException ex) {
-	   System.out.println("User failed" + ex);
-	}
-        
-    }
-
-    @Override
-    public void msgClient(String msg) {
+        Scanner INPUT;
+        try {
+            INPUT = new Scanner(SOCK.getInputStream());
+            String USERNAME = INPUT.nextLine();
+            OUT.println("USER#" + USERNAME);
+        } catch (IOException ex) {
+            System.out.println("User failed" + ex);
+        }
 
     }
 
-    //Ikke færdig!
+    //Ikke færdig! 
     @Override
-    public void msgServer(String msg) {
+    public void msgServer(ArrayList receivers, String msg) {
 
-        try{
-        for (int i = 1; i <= ChatServer.ConnectionArray.size(); i++) {
-            Socket TEMPSOCK = ChatServer.ConnectionArray.get(i - 1);
-            PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
-            TEMPOUT.println("");
-            TEMPOUT.println(dt.timeStamp());
-            TEMPOUT.println(TEMPSOCK.getLocalAddress().getHostName() + ": \t" + MESSAGE);
-            TEMPOUT.flush();
+        tempArray = receivers;
 
-            System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
-        }
-        }
-        catch(Exception e){
-        
+        //Message is sent to spicifik people.
+        if (!receivers.isEmpty() || receivers != null) {
+            try {
+                for (int i = 1; i < receivers.size(); i++) {
+                    Socket TEMPSOCK = ChatServer.usersHashmap.get(receivers.get(i - 1));
+                    PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
+                    TEMPOUT.println(username + ": \t" + MESSAGE);
+                    TEMPOUT.flush();
+                    System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        } //Message sent to all.
+        else {
+
+            try {
+                for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
+
+                    Socket TEMPSOCK = ChatServer.usersArray.get(i - 1).getSOCK();
+                    PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
+                    TEMPOUT.println("");
+                    TEMPOUT.println(dt.timeStamp());
+                    TEMPOUT.println(username + ": \t" + MESSAGE);
+                    TEMPOUT.flush();
+
+                    System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
+
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
     }
 
@@ -144,10 +155,10 @@ public class ChatServerReturn implements Runnable, ChatInterface {
     public void UserList() {
 
         try {
-            for (int i = 1; i <= ChatServer.ConnectionArray.size(); i++) {
-                Socket TEMPSOCK = ChatServer.ConnectionArray.get(i - 1);
+            for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
+                Socket TEMPSOCK = ChatServer.usersArray.get(i - 1).getSOCK();
                 PrintWriter OUT = new PrintWriter(TEMPSOCK.getOutputStream());
-                OUT.println("USERLIST#" + CurrentUsers);
+                OUT.println("USERLIST#" + usersArray);
                 OUT.flush();
             }
         } catch (Exception e) {
@@ -155,10 +166,8 @@ public class ChatServerReturn implements Runnable, ChatInterface {
         }
     }
 
-    public void addUserName(Socket X) throws IOException {
+    @Override
+    public void msgClient(String msg) {
 
-        Scanner INPUT = new Scanner(X.getInputStream());
-        String USERNAME = INPUT.nextLine();
-        CurrentUsers.add(USERNAME);
     }
 }

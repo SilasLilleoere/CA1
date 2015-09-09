@@ -1,5 +1,7 @@
 package Interface;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Christian
@@ -16,6 +18,6 @@ public interface ChatInterface {
     
     public void UserList();
     
-    public void msgServer(String msg);
+    public void msgServer(ArrayList receivers, String msg);
     
 }

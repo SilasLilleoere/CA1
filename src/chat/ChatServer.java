@@ -1,6 +1,9 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
+ /*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package chat;
@@ -8,20 +11,15 @@ package chat;
 import Interface.ChatInterface;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.net.*;
+import java.util.*;
 
-/**
- *
- * @author Silas
- */
+
+
 public class ChatServer {
 
-    public static ArrayList<Socket> ConnectionArray = new ArrayList<Socket>();
-    public static ArrayList<String> CurrentUsers = new ArrayList<String>();
+    public static ArrayList<ClientHandler> usersArray = new ArrayList<ClientHandler>();
+    public static HashMap<String, Socket> usersHashmap = new HashMap<String, Socket>();
 
     public static void main(String[] args) throws IOException {
 
@@ -43,11 +41,16 @@ public class ChatServer {
 
             while (true) {
                 Socket SOCK = SERVER.accept();
-                ConnectionArray.add(SOCK);
+                Scanner INPUT = new Scanner(SOCK.getInputStream());
+                String USERNAME = INPUT.nextLine();
+                
+                ClientHandler CH = new ClientHandler(SOCK, USERNAME);
+                usersArray.add(CH);
+                usersHashmap.put(USERNAME, SOCK);
 
                 System.out.println("Client connected from: " + SOCK.getLocalAddress().getHostName());
 
-                ChatServerReturn CHAT = new ChatServerReturn(SOCK);
+                ChatServerReturn CHAT = new ChatServerReturn(SOCK, USERNAME);
                 Thread X = new Thread(CHAT);
                 X.start();
             }
