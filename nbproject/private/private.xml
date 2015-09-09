@@ -2,6 +2,11 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/Hjemme/Documents/NetBeansProjects/CA1/src/Shared/Protocols.java</file>
+            <file>file:/C:/Users/Hjemme/Documents/NetBeansProjects/CA1/src/Interface/ChatInterface.java</file>
+            <file>file:/C:/Users/Hjemme/Documents/NetBeansProjects/CA1/src/chat/ChatServer.java</file>
+            <file>file:/C:/Users/Hjemme/Documents/NetBeansProjects/CA1/src/chat/ChatServerReturn.java</file>
+        </group>
     </open-files>
 </project-private>

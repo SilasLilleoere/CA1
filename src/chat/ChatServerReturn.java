@@ -5,17 +5,21 @@
  */
 package chat;
 
+import Interface.ChatInterface;
+import static chat.ChatServer.CurrentUsers;
 import date.DateTime;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Silas
  */
-public class ChatServerReturn implements Runnable {
+public class ChatServerReturn implements Runnable, ChatInterface {
 
     DateTime dt = new DateTime();
     Socket SOCK;
@@ -26,6 +30,12 @@ public class ChatServerReturn implements Runnable {
 
     public ChatServerReturn(Socket X) {
         this.SOCK = X;
+        try {
+            addUserName(SOCK);
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+        UserList();
     }
 
 //  Check for dead connections ------------------------------------------------------------
@@ -45,6 +55,7 @@ public class ChatServerReturn implements Runnable {
 
                 System.out.println(TEMPSOCK.getLocalAddress().getHostName() + " disconnected!");
             }
+            UserList();
         }
 
     }
@@ -70,16 +81,7 @@ public class ChatServerReturn implements Runnable {
 
                     System.out.println("Client said: " + MESSAGE);
 
-                    for (int i = 1; i <= ChatServer.ConnectionArray.size(); i++) {
-                        Socket TEMPSOCK = ChatServer.ConnectionArray.get(i - 1);
-                        PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
-                        TEMPOUT.println("");
-                        TEMPOUT.println(dt.timeStamp());
-                        TEMPOUT.println(TEMPSOCK.getLocalAddress().getHostName() + ": \t" + MESSAGE);
-                        TEMPOUT.flush();
-
-                        System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
-                    }
+                    //--
                 }
             } finally {
                 SOCK.close();
@@ -89,4 +91,62 @@ public class ChatServerReturn implements Runnable {
         }
     }
 //------------------------------------------------------------
+
+    @Override
+    public void Stop(String msg) {
+
+    }
+
+    @Override
+    public void User(String msg) {
+
+    }
+
+    @Override
+    public void msgClient(String msg) {
+
+    }
+
+    //Ikke færdig!
+    @Override
+    public void msgServer(String msg) {
+
+        try{
+        for (int i = 1; i <= ChatServer.ConnectionArray.size(); i++) {
+            Socket TEMPSOCK = ChatServer.ConnectionArray.get(i - 1);
+            PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
+            TEMPOUT.println("");
+            TEMPOUT.println(dt.timeStamp());
+            TEMPOUT.println(TEMPSOCK.getLocalAddress().getHostName() + ": \t" + MESSAGE);
+            TEMPOUT.flush();
+
+            System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
+        }
+        }
+        catch(Exception e){
+        
+        }
+    }
+
+    @Override
+    public void UserList() {
+
+        try {
+            for (int i = 1; i <= ChatServer.ConnectionArray.size(); i++) {
+                Socket TEMPSOCK = ChatServer.ConnectionArray.get(i - 1);
+                PrintWriter OUT = new PrintWriter(TEMPSOCK.getOutputStream());
+                OUT.println("USERLIST#" + CurrentUsers);
+                OUT.flush();
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void addUserName(Socket X) throws IOException {
+
+        Scanner INPUT = new Scanner(X.getInputStream());
+        String USERNAME = INPUT.nextLine();
+        CurrentUsers.add(USERNAME);
+    }
 }
