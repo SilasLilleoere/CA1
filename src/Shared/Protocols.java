@@ -14,7 +14,7 @@ public class Protocols {
     //Client Commands
     public static final String STOP = "STOP#";
     public static final String USERNAME = "USER#";
-    public static final String MSG = "MGS#"; //Also used for Server
+    public static final String MSG = "MSG#"; //Also used for Server
 
     //-------------------------------------------
     //Server Commands

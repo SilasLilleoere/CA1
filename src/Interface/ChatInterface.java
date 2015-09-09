@@ -8,15 +8,15 @@ import java.util.ArrayList;
  */
 public interface ChatInterface {
     
-    public void Stop(String msg);
+    public void stop();
     
-    public void User(String msg);
+    public void user();
     
-    public void msgClient(String msg);
+//    public void msgClient(String msg);
     
     //---------------------------------
     
-    public void UserList();
+    public void userList();
     
     public void msgServer(ArrayList receivers, String msg);
     

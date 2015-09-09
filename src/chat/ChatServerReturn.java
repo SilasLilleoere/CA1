@@ -6,6 +6,7 @@
 package chat;
 
 import Interface.ChatInterface;
+import Shared.Protocols;
 import static chat.ChatServer.usersArray;
 import date.DateTime;
 import java.io.IOException;
@@ -19,6 +20,8 @@ import java.util.*;
  */
 public class ChatServerReturn implements Runnable, ChatInterface {
 
+    String[] hashtag;
+    String[] comma;
     String username;
     ArrayList<String> tempArray = new ArrayList<String>();
     DateTime dt = new DateTime();
@@ -31,7 +34,7 @@ public class ChatServerReturn implements Runnable, ChatInterface {
     public ChatServerReturn(Socket X, String username) {
         this.SOCK = X;
         this.username = username;
-        UserList();
+        userList();
     }
 
 //  Check for dead connections ------------------------------------------------------------
@@ -51,7 +54,7 @@ public class ChatServerReturn implements Runnable, ChatInterface {
 
                 System.out.println(TEMPSOCK.getLocalAddress().getHostName() + " disconnected!");
             }
-            UserList();
+            userList();
         }
 
     }
@@ -74,13 +77,39 @@ public class ChatServerReturn implements Runnable, ChatInterface {
                     }
 
                     MESSAGE = INPUT.nextLine();
+                    System.out.println("NEW MESSAGE OMGD: \t" + MESSAGE);
 
-                    System.out.println("Client said: " + MESSAGE);
+                    if (MESSAGE.contains(Protocols.MSG)) {
 
+                        System.out.println("Client said: " + MESSAGE);
+
+                        hashtag = MESSAGE.split("#");
+                        System.out.println(hashtag[1]);
+
+                        ArrayList<String> list = new ArrayList();
+                        
+                        if (hashtag[1].contains(",")) {
+                            comma = hashtag[1].split(",");
+                            for (int i = 0; i < comma.length; i++) {
+                                System.out.println("comma: "+comma[i]);
+                                list.add(comma[i]);
+                            }
+
+                        }else{
+                            list.add(hashtag[1]);
+                        }
+
+                        //List<String> list = Arrays.asList(comma);
+
+                        msgServer(list, hashtag[2]);
+
+                    }else if(MESSAGE.contains(Protocols.STOP)){
+                        stop();
+                    }
                     //--
                 }
             } finally {
-                SOCK.close();
+                //SOCK.close();
             }
         } catch (Exception X) {
             System.out.print(X);
@@ -88,41 +117,22 @@ public class ChatServerReturn implements Runnable, ChatInterface {
     }
 //------------------------------------------------------------
 
-    @Override
-    public void Stop(String msg) {
-        try {
-            SOCK.close();
-        } catch (IOException ex) {
-            System.out.println("Stop failed" + ex);
-        }
-    }
-
-    @Override
-    public void User(String msg) {
-        Scanner INPUT;
-        try {
-            INPUT = new Scanner(SOCK.getInputStream());
-            String USERNAME = INPUT.nextLine();
-            OUT.println("USER#" + USERNAME);
-        } catch (IOException ex) {
-            System.out.println("User failed" + ex);
-        }
-
-    }
-
     //Ikke færdig! 
     @Override
     public void msgServer(ArrayList receivers, String msg) {
 
         tempArray = receivers;
-
+        MESSAGE = msg;
+        System.out.println("receivers size: "+receivers.size());
         //Message is sent to spicifik people.
         if (!receivers.isEmpty() || receivers != null) {
             try {
-                for (int i = 1; i < receivers.size(); i++) {
-                    Socket TEMPSOCK = ChatServer.usersHashmap.get(receivers.get(i - 1));
+                for (int i = 0; i < receivers.size(); i++) {
+                    System.out.println("i sout: "+i);
+                    Socket TEMPSOCK = ChatServer.usersHashmap.get(receivers.get(i));
                     PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
                     TEMPOUT.println(username + ": \t" + MESSAGE);
+                    System.out.println(username + ": \t" + MESSAGE);
                     TEMPOUT.flush();
                     System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
                 }
@@ -152,13 +162,14 @@ public class ChatServerReturn implements Runnable, ChatInterface {
     }
 
     @Override
-    public void UserList() {
+    public void userList() {
 
         try {
             for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
                 Socket TEMPSOCK = ChatServer.usersArray.get(i - 1).getSOCK();
                 PrintWriter OUT = new PrintWriter(TEMPSOCK.getOutputStream());
-                OUT.println("USERLIST#" + usersArray);
+                OUT.println("USERLIST#" + usersArray.get(i - 1).getUserName());
+                
                 OUT.flush();
             }
         } catch (Exception e) {
@@ -166,8 +177,31 @@ public class ChatServerReturn implements Runnable, ChatInterface {
         }
     }
 
+//    @Override
+//    public void msgClient(String msg) {
+//
+//    }
+
     @Override
-    public void msgClient(String msg) {
+    public void stop() {
+        try {
+            SOCK.close();
+        } catch (IOException ex) {
+            System.out.println("Stop failed" + ex);
+        }
+    }
+
+    @Override
+    public void user() {
+        Scanner INPUT;
+        try {
+            INPUT = new Scanner(SOCK.getInputStream());
+            String USERNAME = INPUT.nextLine();
+            OUT.println("USER#" + USERNAME);
+        } catch (IOException ex) {
+            System.out.println("User failed" + ex);
+        }
 
     }
+
 }
