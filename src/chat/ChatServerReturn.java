@@ -94,12 +94,24 @@ public class ChatServerReturn implements Runnable, ChatInterface {
 
     @Override
     public void Stop(String msg) {
-
+	try {
+	    SOCK.close();
+	} catch (IOException ex) {
+	    System.out.println("Stop failed" + ex);
+	}
     }
 
     @Override
     public void User(String msg) {
-
+	Scanner INPUT;
+	try {
+	    INPUT = new Scanner(SOCK.getInputStream());
+	    String USERNAME = INPUT.nextLine();
+	    OUT.println("USER#" + USERNAME);
+	} catch (IOException ex) {
+	   System.out.println("User failed" + ex);
+	}
+        
     }
 
     @Override
