@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.net.*;
 import java.util.*;
 
-public class ChatServer {
+public class ChatServer implements Runnable {
 
     public static ArrayList<ClientHandler> usersArray = new ArrayList<ClientHandler>();
     public static HashMap<String, Socket> usersHashmap = new HashMap<String, Socket>();
@@ -50,5 +50,10 @@ public class ChatServer {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    @Override
+    public void run() {
+
     }
 }
