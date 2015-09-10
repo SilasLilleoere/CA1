@@ -40,17 +40,19 @@ public class ChatServer {
             System.out.println("Waiting for a client...");
 
             while (true) {
-                Socket SOCK = SERVER.accept();
-                Scanner INPUT = new Scanner(SOCK.getInputStream());
-                String USERNAME = INPUT.nextLine();
                 
-                ClientHandler CH = new ClientHandler(SOCK, USERNAME);
-                usersArray.add(CH);
-                usersHashmap.put(USERNAME, SOCK);
+                Socket SOCK = SERVER.accept();
+                System.out.println("Er videre efter accept...");
+//                Scanner INPUT = new Scanner(SOCK.getInputStream());
+//                String USERNAME = INPUT.nextLine();
+                
+//                ClientHandler CH = new ClientHandler(SOCK, USERNAME);
+//                usersArray.add(CH);
+//                usersHashmap.put(USERNAME, SOCK);
 
                 System.out.println("Client connected from: " + SOCK.getLocalAddress().getHostName());
 
-                ChatServerReturn CHAT = new ChatServerReturn(SOCK, USERNAME);
+                ChatServerReturn CHAT = new ChatServerReturn(SOCK);
                 Thread X = new Thread(CHAT);
                 X.start();
             }

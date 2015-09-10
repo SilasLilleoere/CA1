@@ -5,11 +5,12 @@ import java.net.Socket;
 public class ClientHandler {
 
     Socket SOCK;
-    String UserName;
+    String userName;
 
-    public ClientHandler(Socket SOCK, String UserName) {
+    public ClientHandler(Socket SOCK, String userName) {
         this.SOCK = SOCK;
-        this.UserName = UserName;
+        this.userName = userName;
+
     }
 
     public Socket getSOCK() {
@@ -17,7 +18,7 @@ public class ClientHandler {
     }
 
     public String getUserName() {
-        return UserName;
+        return userName;
     }
 
 }
