@@ -5,7 +5,7 @@
  */
 package chat;
 
-import Interface.ChatInterface;
+import Interface.ServerInterface;
 import Shared.Protocols;
 import date.DateTime;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.*;
  *
  * @author Silas
  */
-public class ChatServerReturn implements Runnable, ChatInterface {
+public class ChatServerReturn implements Runnable, ServerInterface {
 
     private String[] hashtag;
     private String[] comma;
@@ -60,7 +60,7 @@ public class ChatServerReturn implements Runnable, ChatInterface {
 //------------------------------------------------------------
     @Override
     public void run() {
-        
+
         onStart();
 
         try {
@@ -100,7 +100,7 @@ public class ChatServerReturn implements Runnable, ChatInterface {
                         }
 
                         //List<String> list = Arrays.asList(comma);
-                        msgServer(list, hashtag[2]);
+                        msgServer(list, MESSAGE);
 
                     } else if (MESSAGE.contains(Protocols.STOP)) {
                         stop();
@@ -130,7 +130,7 @@ public class ChatServerReturn implements Runnable, ChatInterface {
                     System.out.println("i sout: " + i);
                     Socket TEMPSOCK = ChatServer.usersHashmap.get(receivers.get(i));
                     PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
-                    TEMPOUT.println(userName + ": \t" + MESSAGE);
+                    TEMPOUT.println(MESSAGE);
                     System.out.println(userName + ": \t" + MESSAGE);
                     TEMPOUT.flush();
                     System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
@@ -152,7 +152,6 @@ public class ChatServerReturn implements Runnable, ChatInterface {
                     TEMPOUT.flush();
 
                     System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
-
                 }
             } catch (Exception e) {
                 System.out.println(e);
