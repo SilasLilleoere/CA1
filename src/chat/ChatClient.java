@@ -28,10 +28,16 @@ public class ChatClient implements Runnable, ClientInterface {
     public ChatClient(Socket S) {
         this.SOCK = S;
     }
-
-    public static void main(String[] args) {
-
+    
+    public ChatClient() {
+	
     }
+    
+    public static void main(String[] args) {
+	
+    }
+
+   
 
     @Override
     public void run() {
