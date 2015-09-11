@@ -227,6 +227,7 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
 
     @Override
     public void update(Observable o, Object arg) {
+       
         MSGField.setText((String) arg);
     }
 

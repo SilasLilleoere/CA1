@@ -43,11 +43,13 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
             INPUT = new Scanner(SOCK.getInputStream());
         } catch (IOException ex) {
             System.out.println(ex);
-        }
+        }        
+        
+        CommandListenerClass CLC = new CommandListenerClass();
+        new Thread(CLC).start();
 
-        while (true) {
-            commandListener();
-        }
+//        commandListener();
+
     }
 
     public void commandListener() {
@@ -156,13 +158,11 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         notifyGUI(msgStringForGUI);
     }
 
-    
     private void notifyGUI(Object obj) {
         setChanged();
         notifyObservers(obj);
     }
-    
-    
+
     //Should be run by the GUI.
     @Override
     public boolean connect(String ip, int port) {
@@ -191,6 +191,18 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         String[] listOfUsers = userListForGUI.split(",");
 
         notifyGUI(userListForGUI);
+    }
+
+    private class CommandListenerClass implements Runnable {
+
+        @Override
+        public void run() {
+            
+            while (true) {
+                commandListener();
+            }
+        }
+
     }
 
 }
