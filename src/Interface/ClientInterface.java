@@ -17,10 +17,10 @@ public interface ClientInterface {
     public void sendUsername(String typedUsername);
     
     //Sends message "MSG#{receivers}#{message} to the server.
-    public void sendMsg(ArrayList choosenUsers, String typedMsg);
+    public void sendMsg(String[] choosenUsers, String typedMsg);
     
     //Takes the received message gotten from server, and makes new string from it, that is send too GUI.
-    public void receivedMsg();
+    public void receivedMsg(String msg);
     
     //Connect to server using input.
     public boolean connect(String ip, int port);

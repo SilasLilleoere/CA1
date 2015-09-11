@@ -11,9 +11,10 @@ import Shared.Protocols;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-
-public class ChatClient implements Runnable, ClientInterface {
+public class ChatClient extends Observable implements Runnable, ClientInterface {
 
     Socket SOCK;
     Scanner INPUT;
@@ -40,7 +41,6 @@ public class ChatClient implements Runnable, ClientInterface {
 
         try {
             INPUT = new Scanner(SOCK.getInputStream());
-//            OUT = new PrintWriter(SOCK.getOutputStream());
         } catch (IOException ex) {
             System.out.println(ex);
         }
@@ -50,42 +50,25 @@ public class ChatClient implements Runnable, ClientInterface {
         }
     }
 
-    
     public void commandListener() {
 
-        if (!INPUT.hasNext()) {
-            return;
-        }
         try {
             INPUT = new Scanner(SOCK.getInputStream());
         } catch (IOException ex) {
             System.out.println(ex);
         }
 
+        if (!INPUT.hasNext()) {
+            return;
+        }
+
         String MESSAGE = INPUT.nextLine();
 
-        System.out.println("Message gotten from server: " + MESSAGE);
+        System.out.println("CommandMessage gotten from server: " + MESSAGE);
 
         //MSG#--------------------------------------------------------------
         if (MESSAGE.contains(Protocols.MSG)) {
-
-            System.out.println("Server said: " + MESSAGE);
-
-            hashtag = MESSAGE.split("#");
-            System.out.println(hashtag[1]);
-
-            ArrayList<String> list = new ArrayList();
-
-            if (hashtag[1].contains(",")) {
-                comma = hashtag[1].split(",");
-                for (int i = 0; i < comma.length; i++) {
-                    System.out.println("comma: " + comma[i]);
-                    list.add(comma[i]);
-                }
-            } else {
-                list.add(hashtag[1]);
-            }
-            receivedMsg();
+            receivedMsg(MESSAGE);
         }
         //USERLIST#---------------------------------------------------------
         if (MESSAGE.contains(Protocols.UserList)) {
@@ -95,7 +78,6 @@ public class ChatClient implements Runnable, ClientInterface {
         if (MESSAGE.contains(Protocols.STOP)) {
             disconnect();
         }
-
     }
 
     @Override
@@ -108,6 +90,7 @@ public class ChatClient implements Runnable, ClientInterface {
             System.out.println(ex);
         }
     }
+
     @Override
     public void sendUsername(String typedUsername) {
 
@@ -122,16 +105,57 @@ public class ChatClient implements Runnable, ClientInterface {
 
     }
 
+    //Takes in string array, and typed usermessage from GUI. Creates command string from that, and sends to server. 
     @Override
-    public void sendMsg(ArrayList choosenUsers, String typedMsg) {
-        //Skal modtage besked fra bruger, og hvilken brugere beskeden skal sende til. 
-        //Derefter sende en tekstStreng til Serveren.
-    }
-    @Override
-    public void receivedMsg() {
-        //Skal sende beskeden modtaget fra run(), op til GUI i brugervenlig tekst form.
+    public void sendMsg(String[] choosenUsers, String typedMsg) {
 
+        String stringUsers = "";
+
+        try {
+            if (choosenUsers.length < 0) {
+                for (int i = 0; i < choosenUsers.length; i++) {
+                    if (i > 0) {
+                        stringUsers += "," + choosenUsers[i];
+                    }
+                }
+            } else {
+                stringUsers = "*";
+            }
+
+            OUT = new PrintWriter(SOCK.getOutputStream());
+            OUT.println(Protocols.MSG + stringUsers + "#" + typedMsg);
+            OUT.flush();
+
+        } catch (IOException ex) {
+            System.out.println(ex + "...error is from sendMsg method!");
+        }
     }
+
+    @Override
+    public void receivedMsg(String msg) {
+
+        String msgStringForGUI = "";
+        System.out.println("Server said: " + msg);
+
+        hashtag = msg.split("#");
+
+        msgStringForGUI = hashtag[2];
+
+        ArrayList<String> list = new ArrayList();
+
+        if (hashtag[1].contains(",")) {
+            comma = hashtag[1].split(",");
+            for (int i = 0; i < comma.length; i++) {
+                System.out.println("comma: " + comma[i]);
+                list.add(comma[i]);
+            }
+        } else {
+            list.add(hashtag[1]);
+        }
+        System.out.println("Sends this message to GUI: " +  msgStringForGUI);
+        //Skal sende beskeden modtaget fra run(), op til GUI i brugervenlig tekst form.
+    }
+
     //Should be run by the GUI.
     @Override
     public boolean connect(String ip, int port) {
@@ -153,6 +177,7 @@ public class ChatClient implements Runnable, ClientInterface {
         return true;
 
     }
+
     @Override
     public void receivedUserlist() {
 
