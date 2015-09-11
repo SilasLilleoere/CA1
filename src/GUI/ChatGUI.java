@@ -1,24 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package GUI;
 
 import Interface.ClientInterface;
 import chat.ChatClient;
 import java.util.Observable;
 import java.util.Observer;
+import javax.swing.DefaultListModel;
 
 /**
  *
  * @author Christian
  */
 public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
-
+    DefaultListModel userList = new DefaultListModel();
     ChatClient clientInter = new ChatClient();
    
-    static boolean con = false;
+    static boolean conn = false;
 
     /**
      * Creates new form ChatGUI
@@ -28,17 +24,16 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
         initComponents();
         setLocationRelativeTo(null);
         MSGArea.setText("Disconnected");
-        if (con == false) {
-            connect.setEnabled(true);
-            disconnect.setEnabled(false);
-            send.setEnabled(false);
-        } else {
-            connect.setEnabled(false);
-            disconnect.setEnabled(true);
-            send.setEnabled(true);
-        }
+//        if (conn == false) {
+//            connect.setEnabled(true);
+//            disconnect.setEnabled(false);
+//            send.setEnabled(false);
+//        } else {
+//            connect.setEnabled(false);
+//            disconnect.setEnabled(true);
+//            send.setEnabled(true);
+//        }
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -227,8 +222,17 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-       
-        MSGField.setText((String) arg);
+        if(arg == "MSG#"){
+	    MSGField.setText((String) arg);
+	}else{
+	    userList = (DefaultListModel) arg;
+	    for (int i = 0; i < userList.size(); i++) {
+		userList.addElement(i);
+		
+	    }
+	    jList1.setModel(userList);
+	    
     }
 
+    }
 }

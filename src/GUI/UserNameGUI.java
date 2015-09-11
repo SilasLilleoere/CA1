@@ -59,7 +59,7 @@ public class UserNameGUI extends javax.swing.JFrame {
             }
         });
         getContentPane().add(okButton);
-        okButton.setBounds(271, 90, 51, 43);
+        okButton.setBounds(271, 90, 70, 43);
         getContentPane().add(userName);
         userName.setBounds(10, 92, 251, 41);
 

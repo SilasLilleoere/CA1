@@ -114,7 +114,7 @@ public class Connect extends javax.swing.JFrame {
             UserNameGUI user = new UserNameGUI(clientInter);
             user.setVisible(true);
             this.setVisible(false);
-            ChatGUI.con = true;
+            ChatGUI.conn = true;
         } else {
             connection.setText("Not Connected try again");
             connection.setForeground(Color.red);
