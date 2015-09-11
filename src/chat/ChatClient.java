@@ -154,7 +154,6 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         }
         System.out.println("Sends this message to GUI: " + msgStringForGUI);
         notifyGUI(msgStringForGUI);
-        //Skal sende beskeden modtaget fra run(), op til GUI i brugervenlig tekst form.
     }
 
     
@@ -183,7 +182,6 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         }
         System.out.println("Client Connected to server!");
         return true;
-
     }
 
     @Override
@@ -192,7 +190,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         String userListForGUI = MESSAGE.substring(9);
         String[] listOfUsers = userListForGUI.split(",");
 
-        notifyGUI(MESSAGE);
+        notifyGUI(userListForGUI);
     }
 
 }

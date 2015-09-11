@@ -78,6 +78,7 @@ public class ChatServerReturn implements Runnable, ServerInterface {
 
                 //USER#-----------------------------------------------------                
                 if (MESSAGE.contains(Protocols.USERNAME)) {
+                    System.out.println("Runs user#");
                     user(MESSAGE);
                 }
 
@@ -182,7 +183,7 @@ public class ChatServerReturn implements Runnable, ServerInterface {
                 OUT.flush();
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e+ " ....In userList Method");
         }
     }
 
@@ -197,13 +198,13 @@ public class ChatServerReturn implements Runnable, ServerInterface {
 
     @Override
     public void user(String MESSAGE) {
-
+        
         //if userName already has a value, then user already tped in username.
-        if (userName.isEmpty()) {
-
+        if (userName == null || !MESSAGE.isEmpty()) {
+            
             userName = MESSAGE.substring(5);
 
-            if (!userName.equals("")) {
+            if (!userName.equals("")) {  
 
                 ClientHandler CH = new ClientHandler(SOCK, userName);
                 ChatServer.usersArray.add(CH);
@@ -213,5 +214,6 @@ public class ChatServerReturn implements Runnable, ServerInterface {
         } else {
             System.out.println("User already typed in name");
         }
+  
     }
 }
