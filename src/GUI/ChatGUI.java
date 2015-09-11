@@ -7,21 +7,24 @@ package GUI;
 
 import Interface.ClientInterface;
 import chat.ChatClient;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  *
  * @author Christian
  */
-public class ChatGUI extends javax.swing.JFrame implements Runnable {
+public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
 
-    ClientInterface clientInter = new ChatClient();
+    ChatClient clientInter = new ChatClient();
+   
     static boolean con = false;
 
     /**
      * Creates new form ChatGUI
      */
     public ChatGUI() {
-
+        clientInter.addObserver(this);
         initComponents();
         setLocationRelativeTo(null);
         MSGArea.setText("Disconnected");
@@ -220,6 +223,11 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable {
     @Override
     public void run() {
         this.setVisible(true);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        MSGField.setText((String) arg);
     }
 
 }

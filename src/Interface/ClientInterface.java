@@ -6,6 +6,8 @@
 package Interface;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 
 public interface ClientInterface {
@@ -25,6 +27,6 @@ public interface ClientInterface {
     //Connect to server using input.
     public boolean connect(String ip, int port);
     
-    public void receivedUserlist();
+    public void receivedUserlist(String msg);
     
 }

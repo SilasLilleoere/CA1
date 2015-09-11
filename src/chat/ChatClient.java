@@ -72,7 +72,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         }
         //USERLIST#---------------------------------------------------------
         if (MESSAGE.contains(Protocols.UserList)) {
-            receivedUserlist();
+            receivedUserlist(MESSAGE);
         }
         //STOP#-------------------------------------------------------------
         if (MESSAGE.contains(Protocols.STOP)) {
@@ -84,9 +84,10 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
     public void disconnect() {
 
         try {
-            PrintWriter OUT = new PrintWriter(Protocols.STOP);
+            PrintWriter OUT = new PrintWriter(SOCK.getOutputStream());
+            OUT.println(Protocols.STOP);
             OUT.flush();
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             System.out.println(ex);
         }
     }
@@ -102,7 +103,6 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         } catch (IOException ex) {
             System.out.println(ex);
         }
-
     }
 
     //Takes in string array, and typed usermessage from GUI. Creates command string from that, and sends to server. 
@@ -152,10 +152,18 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         } else {
             list.add(hashtag[1]);
         }
-        System.out.println("Sends this message to GUI: " +  msgStringForGUI);
+        System.out.println("Sends this message to GUI: " + msgStringForGUI);
+        notifyGUI(msgStringForGUI);
         //Skal sende beskeden modtaget fra run(), op til GUI i brugervenlig tekst form.
     }
 
+    
+    private void notifyGUI(Object obj) {
+        setChanged();
+        notifyObservers(obj);
+    }
+    
+    
     //Should be run by the GUI.
     @Override
     public boolean connect(String ip, int port) {
@@ -179,8 +187,12 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
     }
 
     @Override
-    public void receivedUserlist() {
+    public void receivedUserlist(String MESSAGE) {
 
+        String userListForGUI = MESSAGE.substring(9);
+        String[] listOfUsers = userListForGUI.split(",");
+
+        notifyGUI(MESSAGE);
     }
 
 }

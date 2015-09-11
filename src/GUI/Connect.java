@@ -16,9 +16,9 @@ import java.util.ArrayList;
  */
 public class Connect extends javax.swing.JFrame {
 
-    ClientInterface clientInter;
+    ChatClient clientInter;
 
-    public Connect(ClientInterface CI) {
+    public Connect(ChatClient CI) {
 
         this.clientInter = CI;
 

@@ -14,12 +14,12 @@ import chat.ChatClient;
  */
 public class UserNameGUI extends javax.swing.JFrame {
 
-    ClientInterface clientInter;
+    ChatClient clientInter;
 
     public UserNameGUI() {
     }
 
-    public UserNameGUI(ClientInterface CI) {
+    public UserNameGUI(ChatClient CI) {
         this.clientInter = CI;
         setSize(345, 166);
         initComponents();
