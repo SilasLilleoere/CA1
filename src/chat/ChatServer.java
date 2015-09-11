@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.net.*;
 import java.util.*;
 
-public class ChatServer implements Runnable {
+public class ChatServer {
 
     public static ArrayList<ClientHandler> usersArray = new ArrayList<ClientHandler>();
     public static HashMap<String, Socket> usersHashmap = new HashMap<String, Socket>();
@@ -39,7 +39,6 @@ public class ChatServer implements Runnable {
             while (true) {
 
                 Socket SOCK = SERVER.accept();
-                System.out.println("Er videre efter accept...");
                 System.out.println("Client connected from: " + SOCK.getLocalAddress().getHostName());
 
                 ChatServerReturn CHAT = new ChatServerReturn(SOCK);
@@ -50,10 +49,5 @@ public class ChatServer implements Runnable {
         } catch (Exception e) {
             System.out.println(e);
         }
-    }
-
-    @Override
-    public void run() {
-
     }
 }

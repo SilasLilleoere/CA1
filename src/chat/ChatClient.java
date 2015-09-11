@@ -5,18 +5,14 @@
  */
 package chat;
 
+import GUI.ChatGUI;
 import Interface.ClientInterface;
 import Shared.Protocols;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- *
- * @author Hjemme
- */
+
 public class ChatClient implements Runnable, ClientInterface {
 
     Socket SOCK;
@@ -24,20 +20,20 @@ public class ChatClient implements Runnable, ClientInterface {
     PrintWriter OUT;
     private String[] hashtag;
     private String[] comma;
+    static ChatGUI chatGui;
 
     public ChatClient(Socket S) {
         this.SOCK = S;
     }
-    
+
     public ChatClient() {
-	
-    }
-    
-    public static void main(String[] args) {
-	
+
     }
 
-   
+    public static void main(String[] args) {
+        chatGui = new ChatGUI();
+        new Thread(chatGui).start();
+    }
 
     @Override
     public void run() {
@@ -50,46 +46,56 @@ public class ChatClient implements Runnable, ClientInterface {
         }
 
         while (true) {
-
-            if (!INPUT.hasNext()) {
-                return;
-            }
-            try {
-                INPUT = new Scanner(SOCK.getInputStream());
-            } catch (IOException ex) {
-                System.out.println(ex);
-            }
-
-            String MESSAGE = INPUT.nextLine();
-
-            System.out.println("Message gotten from server: " + MESSAGE);
-
-            //#MSG
-            if (MESSAGE.contains(Protocols.MSG)) {
-
-                System.out.println("Server said: " + MESSAGE);
-
-                hashtag = MESSAGE.split("#");
-                System.out.println(hashtag[1]);
-
-                ArrayList<String> list = new ArrayList();
-
-                if (hashtag[1].contains(",")) {
-                    comma = hashtag[1].split(",");
-                    for (int i = 0; i < comma.length; i++) {
-                        System.out.println("comma: " + comma[i]);
-                        list.add(comma[i]);
-                    }
-                } else {
-                    list.add(hashtag[1]);
-                }
-                receivedMsg();
-            }
-            //#USERLIST
-            if (MESSAGE.contains(Protocols.UserList)) {
-                receivedUserlist();
-            }
+            commandListener();
         }
+    }
+
+    
+    public void commandListener() {
+
+        if (!INPUT.hasNext()) {
+            return;
+        }
+        try {
+            INPUT = new Scanner(SOCK.getInputStream());
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+
+        String MESSAGE = INPUT.nextLine();
+
+        System.out.println("Message gotten from server: " + MESSAGE);
+
+        //MSG#--------------------------------------------------------------
+        if (MESSAGE.contains(Protocols.MSG)) {
+
+            System.out.println("Server said: " + MESSAGE);
+
+            hashtag = MESSAGE.split("#");
+            System.out.println(hashtag[1]);
+
+            ArrayList<String> list = new ArrayList();
+
+            if (hashtag[1].contains(",")) {
+                comma = hashtag[1].split(",");
+                for (int i = 0; i < comma.length; i++) {
+                    System.out.println("comma: " + comma[i]);
+                    list.add(comma[i]);
+                }
+            } else {
+                list.add(hashtag[1]);
+            }
+            receivedMsg();
+        }
+        //USERLIST#---------------------------------------------------------
+        if (MESSAGE.contains(Protocols.UserList)) {
+            receivedUserlist();
+        }
+        //STOP#-------------------------------------------------------------
+        if (MESSAGE.contains(Protocols.STOP)) {
+            disconnect();
+        }
+
     }
 
     @Override
@@ -102,10 +108,18 @@ public class ChatClient implements Runnable, ClientInterface {
             System.out.println(ex);
         }
     }
-
     @Override
     public void sendUsername(String typedUsername) {
-        //Skal modtage indtastet navn fra brugeren, og sendes videre til serveren med USER#.
+
+        try {
+            OUT = new PrintWriter(SOCK.getOutputStream());
+            OUT.println(Protocols.USERNAME + typedUsername);
+            OUT.flush();
+            System.out.println("Typed username is: " + typedUsername);
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+
     }
 
     @Override
@@ -113,13 +127,11 @@ public class ChatClient implements Runnable, ClientInterface {
         //Skal modtage besked fra bruger, og hvilken brugere beskeden skal sende til. 
         //Derefter sende en tekstStreng til Serveren.
     }
-
     @Override
     public void receivedMsg() {
         //Skal sende beskeden modtaget fra run(), op til GUI i brugervenlig tekst form.
 
     }
-
     //Should be run by the GUI.
     @Override
     public boolean connect(String ip, int port) {
@@ -137,9 +149,10 @@ public class ChatClient implements Runnable, ClientInterface {
             System.out.println(ex);
             return false;
         }
+        System.out.println("Client Connected to server!");
         return true;
-    }
 
+    }
     @Override
     public void receivedUserlist() {
 

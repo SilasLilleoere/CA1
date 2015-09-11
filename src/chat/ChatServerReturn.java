@@ -13,10 +13,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.*;
 
-/**
- *
- * @author Silas
- */
+
 public class ChatServerReturn implements Runnable, ServerInterface {
 
     private String[] hashtag;
@@ -40,6 +37,8 @@ public class ChatServerReturn implements Runnable, ServerInterface {
         if (!SOCK.isConnected()) {
             for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
                 if (ChatServer.usersArray.get(i).getSOCK() == SOCK) {
+                    
+                    ChatServer.usersHashmap.remove(userName, SOCK);
                     ChatServer.usersArray.remove(i);
                 }
             }
@@ -61,54 +60,54 @@ public class ChatServerReturn implements Runnable, ServerInterface {
     @Override
     public void run() {
 
-        onStart();
-
         try {
-            try {
-                INPUT = new Scanner(SOCK.getInputStream());
-                OUT = new PrintWriter(SOCK.getOutputStream());
 
-                while (true) {
+            INPUT = new Scanner(SOCK.getInputStream());
+            OUT = new PrintWriter(SOCK.getOutputStream());
 
-                    checkConnection();
+            while (true) {
 
-                    if (!INPUT.hasNext()) {
-                        return;
-                    }
+                checkConnection();
 
-                    MESSAGE = INPUT.nextLine();
-                    System.out.println("NEW MESSAGE OMGD: \t" + MESSAGE);
+                if (!INPUT.hasNext()) {
+                    return;
+                }
 
-                    if (MESSAGE.contains(Protocols.MSG)) {
+                MESSAGE = INPUT.nextLine();
+                               
 
-                        System.out.println("Client said: " + MESSAGE);
+                //USER#-----------------------------------------------------                
+                if (MESSAGE.contains(Protocols.USERNAME)) {
+                    user(MESSAGE);
+                }
 
-                        hashtag = MESSAGE.split("#");
-                        System.out.println(hashtag[1]);
+                //MSG#------------------------------------------------------
+                if (MESSAGE.contains(Protocols.MSG)) {
 
-                        ArrayList<String> list = new ArrayList();
+                    System.out.println("Client said: " + MESSAGE);
 
-                        if (hashtag[1].contains(",")) {
-                            comma = hashtag[1].split(",");
-                            for (int i = 0; i < comma.length; i++) {
-                                System.out.println("comma: " + comma[i]);
-                                list.add(comma[i]);
-                            }
+                    hashtag = MESSAGE.split("#");
+                    System.out.println(hashtag[1]);
 
-                        } else {
-                            list.add(hashtag[1]);
+                    ArrayList<String> list = new ArrayList();
+
+                    if (hashtag[1].contains(",")) {
+                        comma = hashtag[1].split(",");
+                        for (int i = 0; i < comma.length; i++) {
+                            System.out.println("comma: " + comma[i]);
+                            list.add(comma[i]);
                         }
 
-                        //List<String> list = Arrays.asList(comma);
-                        msgServer(list, MESSAGE);
-
-                    } else if (MESSAGE.contains(Protocols.STOP)) {
-                        stop();
+                    } else {
+                        list.add(hashtag[1]);
                     }
-                    //--
+
+                    msgServer(list, MESSAGE);
+
+                    //STOP#-----------------------------------------------------
+                } else if (MESSAGE.contains(Protocols.STOP)) {
+                    stop();
                 }
-            } finally {
-                //SOCK.close();
             }
         } catch (Exception X) {
             System.out.print(X);
@@ -148,7 +147,7 @@ public class ChatServerReturn implements Runnable, ServerInterface {
                     PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
                     TEMPOUT.println("");
                     TEMPOUT.println(dt.timeStamp());
-                    TEMPOUT.println(userName + ": \t" + MESSAGE);
+                    TEMPOUT.println(MESSAGE);
                     TEMPOUT.flush();
 
                     System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
@@ -174,11 +173,12 @@ public class ChatServerReturn implements Runnable, ServerInterface {
             }
         }
 
+        //Sends USER# command out to all connected users.
         try {
             for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
                 Socket TEMPSOCK = ChatServer.usersArray.get(i - 1).getSOCK();
                 PrintWriter OUT = new PrintWriter(TEMPSOCK.getOutputStream());
-                OUT.println("USERLIST#" + usersString);
+                OUT.println(Protocols.UserList + usersString);
                 OUT.flush();
             }
         } catch (Exception e) {
@@ -186,10 +186,6 @@ public class ChatServerReturn implements Runnable, ServerInterface {
         }
     }
 
-//    @Override
-//    public void msgClient(String msg) {
-//
-//    }
     @Override
     public void stop() {
         try {
@@ -200,31 +196,22 @@ public class ChatServerReturn implements Runnable, ServerInterface {
     }
 
     @Override
-    public void user() {
-        Scanner INPUT;
-        try {
-            INPUT = new Scanner(SOCK.getInputStream());
-            String USERNAME = INPUT.nextLine();
-            OUT.println("USER#" + USERNAME);
-        } catch (IOException ex) {
-            System.out.println("User failed" + ex);
+    public void user(String MESSAGE) {
+
+        //if userName already has a value, then user already tped in username.
+        if (userName.isEmpty()) {
+
+            userName = MESSAGE.substring(5);
+
+            if (!userName.equals("")) {
+
+                ClientHandler CH = new ClientHandler(SOCK, userName);
+                ChatServer.usersArray.add(CH);
+                ChatServer.usersHashmap.put(userName, SOCK);
+                userList();
+            }
+        } else {
+            System.out.println("User already typed in name");
         }
-
     }
-
-    public void onStart() {
-        try {
-            INPUT = new Scanner(SOCK.getInputStream());
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
-
-        userName = INPUT.nextLine();
-        System.out.println("Username: " + userName);
-        ClientHandler CH = new ClientHandler(SOCK, userName);
-        ChatServer.usersArray.add(CH);
-        ChatServer.usersHashmap.put(userName, SOCK);
-        userList();
-    }
-
 }

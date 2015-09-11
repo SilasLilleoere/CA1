@@ -17,7 +17,7 @@ public interface ServerInterface {
     public void stop();
     
     //Gets the username at 
-    public void user();
+    public void user(String msg);
     
     //Sends list of connected users to all
     public void userList();
