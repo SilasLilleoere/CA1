@@ -16,8 +16,8 @@ public class ChatServer {
 	Utils.setLogFile(logFile,ChatServer.class.getName());
 
         int PORT = 4321;
-        //String IP = "191.238.151";
-        String IP = "localhost";
+        String IP = "191.238.151";
+        //String IP = "localhost";
 
         if (args.length == 2) {
             System.out.println("Args found.");
