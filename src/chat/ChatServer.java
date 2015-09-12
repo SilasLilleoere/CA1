@@ -4,16 +4,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.*;
 import java.util.*;
+import utils.Utils;
 
 public class ChatServer {
 
     public static ArrayList<ClientHandler> usersArray = new ArrayList<ClientHandler>();
     public static HashMap<String, Socket> usersHashmap = new HashMap<String, Socket>();
+    private static final Properties properties = Utils.initProperties("server.properties");
 
     public static void main(String[] args) throws IOException {
+	String logFile = properties.getProperty("logFile");
+	Utils.setLogFile(logFile,ChatServer.class.getName());
 
         int PORT = 4321;
-        String IP = "localhost";
+        String IP = "191.238.151";
 
         if (args.length == 2) {
             System.out.println("Args found.");

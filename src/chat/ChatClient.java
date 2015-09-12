@@ -191,6 +191,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         String[] listOfUsers = userListForGUI.split(",");
 
         notifyGUI(userListForGUI);
+	System.out.println("fisk: " + listOfUsers);
     }
 
     private class CommandListenerClass implements Runnable {
