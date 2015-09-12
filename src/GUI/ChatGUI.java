@@ -233,8 +233,8 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
         if (args.contains(",")) {
             comma = args.split(",");
 
-            for (int i = 0; i < comma.length; i++) {
-                DLM.addElement(comma[i]);
+            for (int i = 1; i <= comma.length; i++) {
+                DLM.addElement(comma[i-1]);
 //                
             }
         }
