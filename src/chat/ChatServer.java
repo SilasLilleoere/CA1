@@ -1,7 +1,6 @@
 package chat;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.*;
 import java.util.*;
 import utils.Utils;
@@ -17,7 +16,8 @@ public class ChatServer {
 	Utils.setLogFile(logFile,ChatServer.class.getName());
 
         int PORT = 4321;
-        String IP = "191.238.151";
+        //String IP = "191.238.151";
+        String IP = "localhost";
 
         if (args.length == 2) {
             System.out.println("Args found.");
@@ -37,7 +37,7 @@ public class ChatServer {
                 Socket SOCK = SERVER.accept();
                 System.out.println("Client connected from: " + SOCK.getLocalAddress().getHostName());
 
-                ChatServerReturn CHAT = new ChatServerReturn(SOCK);
+                ChatServerThread CHAT = new ChatServerThread(SOCK);
                 Thread X = new Thread(CHAT);
                 X.start();
             }

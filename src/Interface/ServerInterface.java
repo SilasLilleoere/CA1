@@ -23,6 +23,6 @@ public interface ServerInterface {
     public void userList();
 
     //Takes in a message send from a client, and sends it on to other connected clients.  
-    public void msgServer(ArrayList receivers, String msg);
+    public void msgServer(ArrayList<String> receivers, String msg);
 
 }

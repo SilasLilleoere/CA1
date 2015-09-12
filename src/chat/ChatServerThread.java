@@ -13,8 +13,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.*;
 
-
-public class ChatServerReturn implements Runnable, ServerInterface {
+public class ChatServerThread implements Runnable, ServerInterface {
 
     private String[] hashtag;
     private String[] comma;
@@ -27,33 +26,29 @@ public class ChatServerReturn implements Runnable, ServerInterface {
     private String MESSAGE = "";
 //------------------------------------------------------------
 
-    public ChatServerReturn(Socket X) {
+    public ChatServerThread(Socket X) {
         this.SOCK = X;
 
     }
 
-//  Check for dead connections ------------------------------------------------------------
-    public void checkConnection() throws IOException {
-        if (!SOCK.isConnected()) {
-            for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
-                if (ChatServer.usersArray.get(i).getSOCK() == SOCK) {
-                    
-                    ChatServer.usersHashmap.remove(userName, SOCK);
-                    ChatServer.usersArray.remove(i);
+//  Check for closed connections ------------------------------------------------------------
+    public void checkConnection() {
+
+        try {
+            if (SOCK.isClosed()) {
+                for (int i = 0; i <= ChatServer.usersArray.size(); i++) {
+                    if (ChatServer.usersArray.get(i).getSOCK() == SOCK) {
+
+                        ChatServer.usersHashmap.remove(userName, SOCK);
+                        ChatServer.usersArray.remove(i);
+                        System.out.println("User " + userName + " is disconnected and removed from server");
+                    }
                 }
+                userList();
             }
-            for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
-
-                Socket TEMPSOCK = ChatServer.usersArray.get(i - 1).getSOCK();
-                PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
-                TEMPOUT.println(TEMPSOCK.getLocalAddress().getHostName() + " disconnected!");
-                TEMPOUT.flush();
-
-                System.out.println(TEMPSOCK.getLocalAddress().getHostName() + " disconnected!");
-            }
-            userList();
+        } catch (Exception ex) {
+            System.out.println(ex + "--- error in checkConnection method");
         }
-
     }
 
 //------------------------------------------------------------
@@ -74,24 +69,24 @@ public class ChatServerReturn implements Runnable, ServerInterface {
                 }
 
                 MESSAGE = INPUT.nextLine();
-                               
 
                 //USER#-----------------------------------------------------                
                 if (MESSAGE.contains(Protocols.USERNAME)) {
-                    System.out.println("Runs user#");
+                    System.out.println("Got a USER# command");
                     user(MESSAGE);
                 }
 
                 //MSG#------------------------------------------------------
                 if (MESSAGE.contains(Protocols.MSG)) {
 
-                    System.out.println("Client said: " + MESSAGE);
+                    System.out.println("Got a MSG# command");
 
                     hashtag = MESSAGE.split("#");
                     System.out.println(hashtag[1]);
 
                     ArrayList<String> list = new ArrayList();
 
+                    //If more than one person, then add to list.
                     if (hashtag[1].contains(",")) {
                         comma = hashtag[1].split(",");
                         for (int i = 0; i < comma.length; i++) {
@@ -99,6 +94,7 @@ public class ChatServerReturn implements Runnable, ServerInterface {
                             list.add(comma[i]);
                         }
 
+                        //if only one persons name or * then only place that in list.
                     } else {
                         list.add(hashtag[1]);
                     }
@@ -107,55 +103,54 @@ public class ChatServerReturn implements Runnable, ServerInterface {
 
                     //STOP#-----------------------------------------------------
                 } else if (MESSAGE.contains(Protocols.STOP)) {
+                    System.out.println("Got a STOP# command");
                     stop();
+                    checkConnection();
+                    break;
                 }
             }
         } catch (Exception X) {
             System.out.print(X);
         }
+        System.out.println("ending serverThread!");
     }
 //------------------------------------------------------------
 
     //Ikke færdig! 
     @Override
-    public void msgServer(ArrayList receivers, String msg) {
+    public void msgServer(ArrayList<String> receivers, String msg) {
 
-        tempArray = receivers;
-        MESSAGE = msg;
         System.out.println("receivers size: " + receivers.size());
-        //Message is sent to spicifik people.
-        if (!receivers.isEmpty() || receivers != null) {
+        //Message is sent to spicifik people, unless that receivers array is empty or has * on the first index.        
+        if (!receivers.isEmpty() && !receivers.get(0).contains("*")) {
             try {
                 for (int i = 0; i < receivers.size(); i++) {
-                    System.out.println("i sout: " + i);
+                    System.out.println("i indeni forloop: " + i);
                     Socket TEMPSOCK = ChatServer.usersHashmap.get(receivers.get(i));
                     PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
                     TEMPOUT.println(MESSAGE);
-                    System.out.println(userName + ": \t" + MESSAGE);
                     TEMPOUT.flush();
-                    System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
+                    
                 }
             } catch (Exception e) {
                 System.out.println(e);
             }
+            System.out.println("MSG send to some users!: " + MESSAGE);
         } //Message sent to all.
         else {
-
             try {
                 for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
 
                     Socket TEMPSOCK = ChatServer.usersArray.get(i - 1).getSOCK();
                     PrintWriter TEMPOUT = new PrintWriter(TEMPSOCK.getOutputStream());
-                    TEMPOUT.println("");
-                    TEMPOUT.println(dt.timeStamp());
                     TEMPOUT.println(MESSAGE);
                     TEMPOUT.flush();
-
-                    System.out.println("Message sent to: " + TEMPSOCK.getLocalAddress().getHostName());
+                    
                 }
             } catch (Exception e) {
                 System.out.println(e);
             }
+            System.out.println("MSG send to all users: " + MESSAGE);
         }
     }
 
@@ -163,6 +158,11 @@ public class ChatServerReturn implements Runnable, ServerInterface {
     public void userList() {
 
         String usersString = "";
+
+        if (ChatServer.usersArray.isEmpty()) {
+            System.out.println("No clients is connected to the server anymore!");
+            return;
+        }
 
         //Makes a String with all the users currently connected to the server, seperated by ",".
         for (int i = 1; i <= ChatServer.usersArray.size(); i++) {
@@ -183,7 +183,7 @@ public class ChatServerReturn implements Runnable, ServerInterface {
                 OUT.flush();
             }
         } catch (Exception e) {
-            System.out.println(e+ " ....In userList Method");
+            System.out.println(e + " ....In userList Method");
         }
     }
 
@@ -191,29 +191,31 @@ public class ChatServerReturn implements Runnable, ServerInterface {
     public void stop() {
         try {
             SOCK.close();
+
         } catch (IOException ex) {
             System.out.println("Stop failed" + ex);
         }
+
     }
 
     @Override
     public void user(String MESSAGE) {
-        
+
         //if userName already has a value, then user already tped in username.
-        if (userName == null || !MESSAGE.isEmpty()) {
-            
+        if (userName == null && !MESSAGE.isEmpty()) {
+
             userName = MESSAGE.substring(5);
 
-            if (!userName.equals("")) {  
+            if (!userName.equals("")) {
 
                 ClientHandler CH = new ClientHandler(SOCK, userName);
                 ChatServer.usersArray.add(CH);
                 ChatServer.usersHashmap.put(userName, SOCK);
                 userList();
+                System.out.println("USERNAME is " + userName);
             }
         } else {
             System.out.println("User already typed in name");
         }
-  
     }
 }
