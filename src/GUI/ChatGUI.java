@@ -11,7 +11,7 @@ import javax.swing.DefaultListModel;
  * @author Christian
  */
 public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
-    DefaultListModel userList = new DefaultListModel();
+    
     ChatClient clientInter = new ChatClient();
    
     static boolean conn = false;
@@ -215,33 +215,37 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
     public void run() {
 	
         this.setVisible(true);
-	String[] usersList = new String[3];
-	usersList[0] = "hans";
-	usersList[1] = "per";
-	usersList[2] = "viggo";
-	for (int i = 0; i < 3; i++) {
-	//	   add(usersList[i]);
-		
-	    }
-	  //  jList1.setModel(usersList);
-	    System.out.println("ny ost " + userList);
     }
+    
+    
+    // Silas
+    public void updateUsers(Object arg){
+    String args = (String) arg;
+        String[] comma;
+        
+        //Create listModel
+        DefaultListModel DLM = new DefaultListModel();
 
+        //Set JList to listModel
+        jList1.setModel(DLM);
+        
+        //Fill listModel
+        if (args.contains(",")) {
+            comma = args.split(",");
+
+            for (int i = 0; i < comma.length; i++) {
+                DLM.addElement(comma[i]);
+//                
+            }
+        }
+        
+    }
+    
+    
     @Override
     public void update(Observable o, Object arg) {
-	System.out.println("fisk");
-        if(arg == "MSG#"){
-	    MSGField.setText((String) arg);
-	}else{
-	    userList = (DefaultListModel) arg;
-	    for (int i = 0; i < userList.size(); i++) {
-		userList.addElement(i);
-		
-	    }
-	    jList1.setModel(userList);
-	    System.out.println("ost " + userList);
-	    
-    }
-
+        System.out.println("update() CALLED - from GUI.");
+        
+        updateUsers(arg);
     }
 }

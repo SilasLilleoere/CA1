@@ -39,6 +39,8 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
     @Override
     public void run() {
 
+        
+        
         try {
             INPUT = new Scanner(SOCK.getInputStream());
         } catch (IOException ex) {
@@ -54,6 +56,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
 
     public void commandListener() {
 
+        
         try {
             INPUT = new Scanner(SOCK.getInputStream());
         } catch (IOException ex) {
@@ -167,13 +170,14 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
     @Override
     public boolean connect(String ip, int port) {
 
+        
         String IP = ip;
         int PORT = port;
 
         try {
             SOCK = new Socket(ip, port);
-            ChatClient client = new ChatClient(SOCK);
-            Thread th1 = new Thread(client);
+            
+            Thread th1 = new Thread(this);
             th1.start();
 
         } catch (IOException ex) {
@@ -191,7 +195,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
         String[] listOfUsers = userListForGUI.split(",");
 
         notifyGUI(userListForGUI);
-	System.out.println("fisk: " + listOfUsers);
+	
     }
 
     private class CommandListenerClass implements Runnable {
