@@ -2,6 +2,9 @@ package GUI;
 
 import Interface.ClientInterface;
 import chat.ChatClient;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.DefaultListModel;
@@ -11,9 +14,9 @@ import javax.swing.DefaultListModel;
  * @author Christian
  */
 public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
-    
+
     ChatClient clientInter = new ChatClient();
-   
+
     static boolean conn = false;
 
     /**
@@ -34,7 +37,7 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
 //            send.setEnabled(true);
 //        }
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -153,7 +156,7 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
     }//GEN-LAST:event_connectActionPerformed
 
     private void sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendActionPerformed
-
+        message();
     }//GEN-LAST:event_sendActionPerformed
 
     private void disconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnectActionPerformed
@@ -213,39 +216,55 @@ public class ChatGUI extends javax.swing.JFrame implements Runnable, Observer {
 
     @Override
     public void run() {
-	
+
         this.setVisible(true);
     }
+
     
     
     // Silas
-    public void updateUsers(Object arg){
-    String args = (String) arg;
+    public void updateUsers(Object arg) {
+        String args = (String) arg;
         String[] comma;
-        
+
         //Create listModel
         DefaultListModel DLM = new DefaultListModel();
 
         //Set JList to listModel
         jList1.setModel(DLM);
-        
+
         //Fill listModel
         if (args.contains(",")) {
             comma = args.split(",");
 
             for (int i = 1; i <= comma.length; i++) {
-                DLM.addElement(comma[i-1]);
+                DLM.addElement(comma[i - 1]);
 //                
             }
         }
-        
+
     }
-    
-    
+
+    public void message() {
+        
+        List stuff = jList1.getSelectedValuesList();
+        List<String> users = new ArrayList();
+        
+        
+        for(Object user : stuff){
+            
+            users.add(user.toString());
+        }
+        
+        
+        
+        clientInter.sendMsg(users, "hi");
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         System.out.println("update() CALLED - from GUI.");
-        
+
         updateUsers(arg);
     }
 }

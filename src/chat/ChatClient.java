@@ -112,21 +112,27 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
 
     //Takes in string array, and typed usermessage from GUI. Creates command string from that, and sends to server. 
     @Override
-    public void sendMsg(String[] choosenUsers, String typedMsg) {
+    public void sendMsg(List choosenUsers, String typedMsg) {
 
         String stringUsers = "";
 
         try {
-            if (choosenUsers.length < 0) {
-                for (int i = 0; i < choosenUsers.length; i++) {
-                    if (i > 0) {
-                        stringUsers += "," + choosenUsers[i];
+            if (choosenUsers.size() > 0) {
+                for (int i = 0; i < choosenUsers.size(); i++) {
+                    if(i == 0){
+                    stringUsers += choosenUsers.get(i);
+                    }
+                    else if (i > 0) {
+                       
+                        stringUsers += "," + choosenUsers.get(i);
+                        System.out.println(stringUsers);
                     }
                 }
             } else {
                 stringUsers = "*";
             }
-
+           
+            
             OUT = new PrintWriter(SOCK.getOutputStream());
             OUT.println(Protocols.MSG + stringUsers + "#" + typedMsg);
             OUT.flush();
@@ -184,6 +190,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
             System.out.println(ex);
             return false;
         }
+        
         System.out.println("Client Connected to server!");
         return true;
     }

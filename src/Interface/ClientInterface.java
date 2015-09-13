@@ -6,6 +6,7 @@
 package Interface;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -19,7 +20,7 @@ public interface ClientInterface {
     public void sendUsername(String typedUsername);
     
     //Sends message "MSG#{receivers}#{message} to the server.
-    public void sendMsg(String[] choosenUsers, String typedMsg);
+    public void sendMsg(List choosenUsers, String typedMsg);
     
     //Takes the received message gotten from server, and makes new string from it, that is send too GUI.
     public void receivedMsg(String msg);
