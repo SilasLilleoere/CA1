@@ -78,8 +78,11 @@
     </Component>
     <Component class="javax.swing.JTextField" name="localhost">
       <Properties>
-        <Property name="text" type="java.lang.String" value="localhost"/>
+        <Property name="text" type="java.lang.String" value="Studypointsex.cloudapp.net"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="localhostActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="connect">
       <Properties>

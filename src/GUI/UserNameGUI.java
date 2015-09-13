@@ -77,6 +77,7 @@ public class UserNameGUI extends javax.swing.JFrame {
         String name = userName.getText();
         
         clientInter.sendUsername(name);
+        clientInter.afs = name;
         this.setVisible(false);
     }//GEN-LAST:event_okButtonActionPerformed
 

@@ -48,7 +48,12 @@ public class Connect extends javax.swing.JFrame {
 
         port.setText("4321");
 
-        localhost.setText("localhost");
+        localhost.setText("Studypointsex.cloudapp.net");
+        localhost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                localhostActionPerformed(evt);
+            }
+        });
 
         connect.setText("Connect");
         connect.addActionListener(new java.awt.event.ActionListener() {
@@ -121,6 +126,10 @@ public class Connect extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_connectActionPerformed
+
+    private void localhostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_localhostActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_localhostActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

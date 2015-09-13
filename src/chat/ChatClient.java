@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 public class ChatClient extends Observable implements Runnable, ClientInterface {
 
+    public String afs;
     Socket SOCK;
     Scanner INPUT;
     PrintWriter OUT;
@@ -116,6 +117,8 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
 
         String stringUsers = "";
 
+        
+        
         try {
             if (choosenUsers.size() > 0) {
                 for (int i = 0; i < choosenUsers.size(); i++) {
@@ -125,7 +128,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
                     else if (i > 0) {
                        
                         stringUsers += "," + choosenUsers.get(i);
-                        System.out.println(stringUsers);
+                        System.out.println("stringUSers is: " +stringUsers);
                     }
                 }
             } else {
@@ -134,7 +137,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
            
             
             OUT = new PrintWriter(SOCK.getOutputStream());
-            OUT.println(Protocols.MSG + stringUsers + "#" + typedMsg);
+            OUT.println(Protocols.MSG + stringUsers + "#" +afs+" said: " + typedMsg);
             OUT.flush();
 
         } catch (IOException ex) {
@@ -150,7 +153,7 @@ public class ChatClient extends Observable implements Runnable, ClientInterface 
 
         hashtag = msg.split("#");
 
-        msgStringForGUI = hashtag[2];
+        msgStringForGUI = "MSG#"+hashtag[1]+"#"+hashtag[2];
 
         ArrayList<String> list = new ArrayList();
 
